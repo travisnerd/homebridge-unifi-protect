@@ -36,6 +36,7 @@ export class ProtectNvr {
   public ufp: ProtectNvrConfig;
   public ufpApi!: ProtectApi;
   private unsupportedDevices: { [index: string]: boolean };
+  private allowUnofficialChannels: boolean;
 
   constructor(platform: ProtectPlatform, nvrOptions: ProtectNvrOptions) {
 
@@ -54,6 +55,7 @@ export class ProtectNvr {
     this.systemInfo = null;
     this.ufp = {} as ProtectNvrConfig;
     this.unsupportedDevices = {};
+    this.allowUnofficialChannels = true;
 
     // Configure our logging.
     this.log = {
@@ -134,7 +136,9 @@ export class ProtectNvr {
     this.name = this.config.name ?? (this.ufp.name ?? this.ufp.marketName);
 
     // If we are running an unsupported version of UniFi Protect, we're done.
-    if(!this.ufp.version.startsWith("4.") || this.ufp.version.split(".").map(Number).slice(0, 2).join(".") < "4.1") {
+
+    // Disable block that prevents EA channel user access.
+    if(!allowUnofficialChannels && (!this.ufp.version.startsWith("4.") || this.ufp.version.split(".").map(Number).slice(0, 2).join(".") < "4.1")) {
 
       this.log.error("This version of HBUP requires running UniFi Protect v4.1 or above using the official Protect release channel only.");
       this.ufpApi.logout();
