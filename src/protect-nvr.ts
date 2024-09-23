@@ -4,7 +4,7 @@
  */
 import { API, APIEvent, HAP, PlatformAccessory } from "homebridge";
 import { HomebridgePluginLogging, MqttClient, retry, sleep } from "homebridge-plugin-utils";
-import { PLATFORM_NAME, PLUGIN_NAME, PROTECT_CONTROLLER_REFRESH_INTERVAL, PROTECT_CONTROLLER_RETRY_INTERVAL, PROTECT_M3U_PLAYLIST_PORT } from "./settings.js";
+import { PLATFORM_NAME, PLUGIN_NAME, PROTECT_ALLOW_UNOFFICIAL_CHANNELS, PROTECT_CONTROLLER_REFRESH_INTERVAL, PROTECT_CONTROLLER_RETRY_INTERVAL, PROTECT_M3U_PLAYLIST_PORT } from "./settings.js";
 import { ProtectApi, ProtectCameraConfig, ProtectChimeConfig, ProtectLightConfig, ProtectNvrBootstrap, ProtectNvrConfig, ProtectSensorConfig,
   ProtectViewerConfig } from "unifi-protect";
 import { ProtectCamera, ProtectChime, ProtectDevice, ProtectDoorbell, ProtectLight, ProtectLiveviews, ProtectNvrSystemInfo, ProtectSensor,
@@ -36,7 +36,6 @@ export class ProtectNvr {
   public ufp: ProtectNvrConfig;
   public ufpApi!: ProtectApi;
   private unsupportedDevices: { [index: string]: boolean };
-  private allowUnofficialChannels: boolean;
 
   constructor(platform: ProtectPlatform, nvrOptions: ProtectNvrOptions) {
 
@@ -55,7 +54,6 @@ export class ProtectNvr {
     this.systemInfo = null;
     this.ufp = {} as ProtectNvrConfig;
     this.unsupportedDevices = {};
-    this.allowUnofficialChannels = true;
 
     // Configure our logging.
     this.log = {
@@ -138,7 +136,7 @@ export class ProtectNvr {
     // If we are running an unsupported version of UniFi Protect, we're done.
 
     // Disable block that prevents EA channel user access.
-    if(!allowUnofficialChannels && (!this.ufp.version.startsWith("4.") || this.ufp.version.split(".").map(Number).slice(0, 2).join(".") < "4.1")) {
+    if(!PROTECT_ALLOW_UNOFFICIAL_CHANNELS && (!this.ufp.version.startsWith("4.") || this.ufp.version.split(".").map(Number).slice(0, 2).join(".") < "4.1")) {
 
       this.log.error("This version of HBUP requires running UniFi Protect v4.1 or above using the official Protect release channel only.");
       this.ufpApi.logout();
