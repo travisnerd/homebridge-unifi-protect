@@ -8,6 +8,9 @@ export const PLUGIN_NAME = "homebridge-unifi-protect";
 // The platform the plugin creates.
 export const PLATFORM_NAME = "UniFi Protect";
 
+// Default option to allow RC and EA channels
+export const PROTECT_ALLOW_UNOFFICIAL_CHANNELS = false;
+
 // How often, in seconds, should we check Protect controllers for new or removed devices.
 export const PROTECT_CONTROLLER_REFRESH_INTERVAL = 120;
 
